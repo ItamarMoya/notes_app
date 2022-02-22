@@ -14,6 +14,11 @@ class NotesApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       home: Home(),
+      theme: ThemeData.light().copyWith(
+        inputDecorationTheme:  InputDecorationTheme(
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(15))
+              ),
+      ),
     );
   }
 }
