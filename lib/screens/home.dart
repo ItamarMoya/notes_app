@@ -46,9 +46,33 @@ class _HomeState extends State<Home> {
              final newNotes= notes.where((currentNote) =>currentNote.title!=note.title).toList();
                 notes=newNotes;
                 setState(() {});
-             },);
+             }, upDate: () async{ 
+               Navigator.pop(context);//quitar el bottom
+              final upDatenote=await Navigator.of(context).push<Note>(MaterialPageRoute(
+                builder: (BuildContext context)
+                  =>Create(note: note,)));
+              if(upDatenote!= null){
+                // for(int i=0;i<notes.length;i++){
+                // final currentNote= notes[i];
+                // if(currentNote.title==note.title){
+                  // notes[i]=upDatenote;
+                  // setState(() {
+                    // 
+                  // });
+                //  break;
+                // }
+            //  }
+            //declarativa
+            final filterNotes= notes.where((currentNote) =>currentNote.title!=note.title).toList();
+            notes=[upDatenote,...filterNotes];
+            setState(() {
+              
+            });
+              }
+             }
+              );
             }
-            ),
+          ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
@@ -70,8 +94,8 @@ class _NoteItem extends StatelessWidget {
 
   final Note note;
   final void Function() delete;
-
-  const _NoteItem(this.note,{Key? key, required this.delete}) : super(key: key);
+  final void Function() upDate;
+  const _NoteItem(this.note,{Key? key, required this.delete, required this.upDate}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -83,13 +107,13 @@ class _NoteItem extends StatelessWidget {
        subtitle: Text(note.desc),
        trailing: Text(DateFormat(DateFormat.YEAR_ABBR_MONTH_DAY).format(note.createdAT)), 
        onTap: (){
-         _showModal(context, delete);
+         _showModal(context, delete,upDate);
        },
       ),
     );
   }
 
-  void _showModal(context, void Function() delete) {
+  void _showModal(context, void Function() delete,void Function()upDate) {
     final style=TextStyle(fontSize: 20);
     showModalBottomSheet(context: context, builder: (BuildContext context){
         return Wrap(
@@ -99,7 +123,11 @@ class _NoteItem extends StatelessWidget {
               padding: const EdgeInsets.all(10.0),
               child: Column(
                 children: [
-                  TextButton(onPressed: (){}, child: Text('Update',style: style,)),
+                  TextButton(onPressed: (){
+                    upDate();
+                    //Navigator.pop(context);
+
+                  }, child: Text('Update',style: style,)),
                   TextButton(onPressed:(){
                     delete();
                     Navigator.pop(context);

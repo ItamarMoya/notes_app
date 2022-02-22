@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:my_notes_app/models/note.dart';
 
 class Create extends StatefulWidget {
+  final Note? note;
+
+  const Create({Key? key, this.note}) : super(key: key);
   @override
   State<Create> createState() => _CreateState();
 }
@@ -12,8 +15,8 @@ class _CreateState extends State<Create> {
 
   @override
   void initState() {
-    _titleController = TextEditingController();
-    _descController = TextEditingController();
+    _titleController = TextEditingController(text: widget.note?.title);
+    _descController = TextEditingController(text: widget.note?.desc);
     super.initState();
   }
 
@@ -26,10 +29,11 @@ class _CreateState extends State<Create> {
 
   @override
   Widget build(BuildContext context) {
+    final title= widget.note!=null ?'UpDate':'Create';
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,
-        title: Text('Create'),
+        title: Text(title),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -66,14 +70,16 @@ class _CreateState extends State<Create> {
                 final desc=_descController.text;
                 if(title.isNotEmpty&&desc.isNotEmpty){
                   //crear una nota
-                  final note =Note(title: title, desc: desc, createdAT: DateTime.now());
+                  final note =Note(title: title,
+                   desc: desc, 
+                   createdAT: widget.note?.createdAT ?? DateTime.now());
                   Navigator.of(context).pop(note);
                 }
                 else{
                   _showSnackbar(context);
                 }
               }, 
-              child: Text('Create')),
+              child: Text(title)),
             ),
             SizedBox(
               height: 8,
