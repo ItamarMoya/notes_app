@@ -11,7 +11,7 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  final List<Note> notes=[];
+   List<Note> notes=[];
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -26,7 +26,27 @@ class _HomeState extends State<Home> {
             itemCount: notes.length,
             itemBuilder: (_, int index){
               final  note= notes[index];
-             return _NoteItem(note);
+             return _NoteItem(note, 
+             delete: () { 
+               //IMPERATIVA mutable
+              // for(int i=0;i<notes.length;i++){
+                // final currentNote= notes[i];
+                // if(currentNote.title==note.title){
+                  // notes.removeAt(i);
+                  // setState(() {
+                    // 
+                  // });
+                //  break;
+                // }
+              // }
+
+             //declarativa e inmutabl
+
+
+             final newNotes= notes.where((currentNote) =>currentNote.title!=note.title).toList();
+                notes=newNotes;
+                setState(() {});
+             },);
             }
             ),
         ),
@@ -49,8 +69,9 @@ class _HomeState extends State<Home> {
 class _NoteItem extends StatelessWidget {
 
   final Note note;
+  final void Function() delete;
 
-  const _NoteItem(this.note,{Key? key}) : super(key: key);
+  const _NoteItem(this.note,{Key? key, required this.delete}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +82,36 @@ class _NoteItem extends StatelessWidget {
        title: Text(note.title, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
        subtitle: Text(note.desc),
        trailing: Text(DateFormat(DateFormat.YEAR_ABBR_MONTH_DAY).format(note.createdAT)), 
+       onTap: (){
+         _showModal(context, delete);
+       },
       ),
     );
+  }
+
+  void _showModal(context, void Function() delete) {
+    final style=TextStyle(fontSize: 20);
+    showModalBottomSheet(context: context, builder: (BuildContext context){
+        return Wrap(
+          alignment: WrapAlignment.center,
+          children: [
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                children: [
+                  TextButton(onPressed: (){}, child: Text('Update',style: style,)),
+                  TextButton(onPressed:(){
+                    delete();
+                    Navigator.pop(context);
+                  }, 
+                  child: Text('Delete',style: style,)),
+                  
+                 
+                ],
+              ),
+            ),
+          ],
+        );
+    });
   }
 }
