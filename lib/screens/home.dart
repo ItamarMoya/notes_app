@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:my_notes_app/models/note.dart';
@@ -12,23 +14,22 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
    List<Note> notes=[];
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        centerTitle: true,
-        title: Text('Simple Notes App'),
-      ),
-      body: SafeArea(
-        child:Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: ListView.builder(
-            itemCount: notes.length,
-            itemBuilder: (_, int index){
-              final  note= notes[index];
-             return _NoteItem(note, 
-             delete: () { 
-               //IMPERATIVA mutable
+
+   Future<Note?> _getNote(BuildContext context,{Note? note}) async =>Navigator.of(context).push<Note>(MaterialPageRoute(builder: (_)=> Create(note:note,)));
+   
+
+    Future<void>  _createNote(BuildContext context)async{
+      final note= await _getNote(context);
+         if(note!=null){
+            notes.add(note);
+            setState(() {
+              
+            });
+         }
+    }
+
+    void _deleteNote(Note note){
+        //IMPERATIVA mutable
               // for(int i=0;i<notes.length;i++){
                 // final currentNote= notes[i];
                 // if(currentNote.title==note.title){
@@ -46,11 +47,11 @@ class _HomeState extends State<Home> {
              final newNotes= notes.where((currentNote) =>currentNote.title!=note.title).toList();
                 notes=newNotes;
                 setState(() {});
-             }, upDate: () async{ 
-               Navigator.pop(context);//quitar el bottom
-              final upDatenote=await Navigator.of(context).push<Note>(MaterialPageRoute(
-                builder: (BuildContext context)
-                  =>Create(note: note,)));
+    }
+
+    Future<void> _updateNote( Note note)async{
+      Navigator.pop(context);//quitar el bottom
+              final upDatenote=await _getNote(context, note: note);
               if(upDatenote!= null){
                 // for(int i=0;i<notes.length;i++){
                 // final currentNote= notes[i];
@@ -69,22 +70,33 @@ class _HomeState extends State<Home> {
               
             });
               }
-             }
+    }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        centerTitle: true,
+        title: Text('Simple Notes App'),
+      ),
+      body: SafeArea(
+        child:Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: ListView.builder(
+            itemCount: notes.length,
+            itemBuilder: (_, int index){
+              final  note= notes[index];
+             return _NoteItem(note, 
+             delete: () => _deleteNote(note), 
+             
+             upDate: () =>_updateNote(note)
               );
             }
           ),
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed:()async{
-         final note= await Navigator.of(context).push<Note>(MaterialPageRoute(builder: (_)=>Create()));
-         if(note!=null){
-            notes.add(note);
-            setState(() {
-              
-            });
-         }
-        } ,
+        onPressed:()=>_createNote(context),
         child: Icon(Icons.add),),
     );
   }
