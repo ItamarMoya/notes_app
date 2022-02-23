@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:my_notes_app/models/note.dart';
+import 'package:uuid/uuid.dart';
 
 class Create extends StatefulWidget {
   final Note? note;
@@ -12,11 +13,13 @@ class Create extends StatefulWidget {
 class _CreateState extends State<Create> {
   late TextEditingController _titleController;
   late TextEditingController _descController;
+  late Color color;
 
   @override
   void initState() {
     _titleController = TextEditingController(text: widget.note?.title);
     _descController = TextEditingController(text: widget.note?.desc);
+    color= widget.note?.color?? Colors.primaries[0];
     super.initState();
   }
 
@@ -59,9 +62,26 @@ class _CreateState extends State<Create> {
                 ),
               ),
             ),
+            SizedBox(height: 8,),
+
             SizedBox(
-              height: 8,
+              height: 60,
+              child: ListView.builder(
+                physics: BouncingScrollPhysics(),
+                itemCount: 15,
+                scrollDirection: Axis.horizontal,
+                itemBuilder: (BuildContext context, int index){
+                  final bgcolor=Colors.primaries[index];
+                return _ButtomColor(bgcolor: bgcolor, onTap: () { 
+                  color=bgcolor;
+                    setState(() {
+                      
+                    });
+                 }, isSelected: color==bgcolor,);
+              }),
             ),
+
+            SizedBox(height: 8,),
             SizedBox(
               width: double.infinity,
               height: 50,
@@ -69,8 +89,11 @@ class _CreateState extends State<Create> {
                 final title=_titleController.text;
                 final desc=_descController.text;
                 if(title.isNotEmpty&&desc.isNotEmpty){
-                  //crear una nota
-                  final note =Note(title: title,
+                  //crear una nota 
+                  final note =Note(
+                    color: color,
+                    uid: widget.note?.uid??Uuid().v4(),
+                  title: title,
                    desc: desc, 
                    createdAT: widget.note?.createdAT ?? DateTime.now());
                   Navigator.of(context).pop(note);
@@ -93,5 +116,27 @@ class _CreateState extends State<Create> {
   void _showSnackbar(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text('Title or description can´t be empty.')));
+  }
+}
+
+class _ButtomColor extends StatelessWidget {
+  final void Function ()onTap;
+  final bool isSelected;
+  const _ButtomColor({
+    Key? key,
+    required  this.bgcolor, required this.onTap,required this.isSelected,
+  }) : super(key: key);
+
+  final MaterialColor bgcolor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.only(right: 4),
+      child: IconButton(
+        icon:Icon(isSelected ? Icons.radio_button_checked  : Icons.circle,
+         size: 50,color:bgcolor,) ,
+      onPressed:onTap)
+    );
   }
 }

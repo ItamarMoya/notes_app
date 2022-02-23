@@ -44,7 +44,7 @@ class _HomeState extends State<Home> {
              //declarativa e inmutabl
 
 
-             final newNotes= notes.where((currentNote) =>currentNote.title!=note.title).toList();
+             final newNotes= notes.where((currentNote) =>currentNote.uid!=note.uid).toList();
                 notes=newNotes;
                 setState(() {});
     }
@@ -64,7 +64,7 @@ class _HomeState extends State<Home> {
                 // }
             //  }
             //declarativa
-            final filterNotes= notes.where((currentNote) =>currentNote.title!=note.title).toList();
+            final filterNotes= notes.where((currentNote) =>currentNote.uid!=note.uid).toList();
             notes=[upDatenote,...filterNotes];
             setState(() {
               
@@ -114,10 +114,10 @@ class _NoteItem extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 15),
       child: ListTile(
-        tileColor: Colors.yellow,
-       title: Text(note.title, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20),),
-       subtitle: Text(note.desc),
-       trailing: Text(DateFormat(DateFormat.YEAR_ABBR_MONTH_DAY).format(note.createdAT)), 
+        tileColor: note.color,
+       title: Text(note.title, style: TextStyle(fontWeight: FontWeight.bold,fontSize: 20,color: Colors.white),),
+       subtitle: Text(note.desc, style: TextStyle(color: Colors.white),),
+       trailing: Text(DateFormat(DateFormat.YEAR_ABBR_MONTH_DAY).format(note.createdAT),style: TextStyle(color: Colors.white)), 
        onTap: (){
          _showModal(context, delete,upDate);
        },
